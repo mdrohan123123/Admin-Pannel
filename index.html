@@ -85,6 +85,8 @@
             padding: 1rem 2rem;
             border-radius: 2rem;
             border: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .admin-header h1 {
@@ -94,6 +96,27 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .clear-all-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .clear-all-btn:hover { background: var(--danger); color: white; }
 
         .logout-btn {
             background: rgba(239, 68, 68, 0.1);
@@ -116,13 +139,80 @@
             margin-bottom: 1.5rem;
         }
 
-        .admin-section h3 {
-            color: var(--primary);
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h3 {
+            color: var(--primary);
             font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            margin: 0;
+        }
+
+        .save-section-btn {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .save-section-btn:hover { background: var(--success); color: white; }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
         }
 
         .admin-item { margin-bottom: 1.2rem; }
@@ -206,10 +296,12 @@
         .admin-news-info { flex: 1; }
         .admin-news-title { font-weight: 600; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.3rem; }
         .admin-news-preview { font-size: 0.8rem; color: var(--text-dim); opacity: 0.7; }
-        .admin-news-delete {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: var(--danger);
+        .admin-news-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .admin-news-edit, .admin-news-delete {
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -218,7 +310,17 @@
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
-            margin-left: 10px;
+        }
+        .admin-news-edit {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: var(--primary);
+        }
+        .admin-news-edit:hover { background: var(--primary); color: white; }
+        .admin-news-delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
         }
         .admin-news-delete:hover { background: var(--danger); color: white; }
 
@@ -234,7 +336,6 @@
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            margin-left: 1rem;
         }
         .delete-all-btn:hover { background: var(--danger); color: white; }
 
@@ -246,6 +347,45 @@
             margin-top: 1rem;
         }
         .preview-otp .otp-code { font-size: 2rem; margin: 0; }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            left: 2rem;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(200%);
+            transition: transform 0.3s ease;
+            pointer-events: auto;
+            max-width: 400px;
+            width: auto;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show {
+            transform: translateY(0);
+        }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+        .toast.success { background: var(--success); }
+        @media (min-width: 768px) {
+            .toast-container {
+                left: auto;
+                width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -263,12 +403,18 @@
     <div id="adminContent">
         <div class="admin-header">
             <h1><i class="fa-solid fa-lock"></i> Admin Control Panel</h1>
-            <div class="logout-btn" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
+            <div class="header-buttons">
+                <div class="clear-all-btn" onclick="clearAllData()"><i class="fa-solid fa-trash-can"></i> Clear All Data</div>
+                <div class="logout-btn" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
+            </div>
         </div>
 
         <!-- Theme Customizer -->
         <div class="admin-section">
-            <h3><i class="fa-solid fa-palette"></i> Theme Customizer</h3>
+            <div class="section-header">
+                <h3><i class="fa-solid fa-palette"></i> Theme Customizer</h3>
+                <span class="save-section-btn" onclick="saveTheme()"><i class="fa-solid fa-save"></i> Save Theme</span>
+            </div>
             <div class="theme-picker">
                 <div class="color-dot" style="background: #38bdf8;" onclick="setTheme('#38bdf8', '#818cf8')" title="Sky Blue"></div>
                 <div class="color-dot" style="background: #fbbf24;" onclick="setTheme('#fbbf24', '#f59e0b')" title="Yellow"></div>
@@ -288,7 +434,10 @@
 
         <!-- Security Settings -->
         <div class="admin-section">
-            <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
+            <div class="section-header">
+                <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
+                <span class="save-section-btn" onclick="saveSecurity()"><i class="fa-solid fa-save"></i> Save Security</span>
+            </div>
             <div class="admin-item">
                 <label>Default Secret Key</label>
                 <input type="text" id="admin-default-secret" placeholder="BASE32-SECRET-KEY">
@@ -309,7 +458,10 @@
 
         <!-- Site Control -->
         <div class="admin-section">
-            <h3><i class="fa-solid fa-globe"></i> Site Control</h3>
+            <div class="section-header">
+                <h3><i class="fa-solid fa-globe"></i> Site Control</h3>
+                <span class="save-section-btn" onclick="saveSiteControl()"><i class="fa-solid fa-save"></i> Save Site Control</span>
+            </div>
             <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="admin-item">
                     <label>Site Status</label>
@@ -332,10 +484,16 @@
 
         <!-- News Management -->
         <div class="admin-section">
-            <h3>
-                <i class="fa-solid fa-newspaper"></i> News Management
-                <span class="delete-all-btn" onclick="deleteAllNews()"><i class="fa-solid fa-trash-can"></i> Delete All</span>
-            </h3>
+            <div class="section-header">
+                <h3><i class="fa-solid fa-newspaper"></i> News Management</h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="delete-all-btn" onclick="deleteAllNews()"><i class="fa-solid fa-trash-can"></i> Delete All</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-news" onchange="toggleNewsVisibility()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
             <div class="admin-item">
                 <label>Title</label>
                 <input type="text" id="admin-news-title" placeholder="Update title">
@@ -345,15 +503,24 @@
                 <textarea id="admin-news-body" rows="3" placeholder="Update details..."></textarea>
             </div>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="btn" onclick="addNewsItem()" style="flex: 2;">➕ Add News</button>
-                <button class="btn btn-secondary" onclick="clearNewsInputs()" style="flex: 1;">🗑️ Clear</button>
+                <button class="btn" id="add-news-btn" onclick="addOrUpdateNewsItem()" style="flex: 2;">➕ Add News</button>
+                <button class="btn btn-secondary" onclick="clearNewsInputs()" style="flex: 1;" id="clear-news-btn">🗑️ Clear</button>
             </div>
             <div id="admin-news-list" class="admin-news-list"></div>
         </div>
 
         <!-- Ad Management (10 slots) -->
         <div class="admin-section">
-            <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)</h3>
+            <div class="section-header">
+                <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)</h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="save-section-btn" onclick="saveAds()"><i class="fa-solid fa-save"></i> Save All Ads</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-ads" onchange="toggleAdsVisibility()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
             <div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
                 <div class="admin-item"><label>Ad 1</label><textarea id="admin-ad-1" rows="2" placeholder="AdSense code or HTML"></textarea></div>
                 <div class="admin-item"><label>Ad 2</label><textarea id="admin-ad-2" rows="2" placeholder="AdSense code or HTML"></textarea></div>
@@ -368,10 +535,15 @@
             </div>
         </div>
 
-        <!-- Save Button -->
+        <!-- Optional: Old Save All button (can be removed, but kept for convenience) -->
         <button class="btn" onclick="saveAllSettings()" style="width: 100%; padding: 1.5rem; font-size: 1.2rem; margin-bottom: 2rem;">
-            <i class="fa-solid fa-save"></i> Save All Settings to Firebase
+            <i class="fa-solid fa-save"></i> Save All Settings to Firebase (Legacy)
         </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container">
+        <div class="toast" id="toast-message"></div>
     </div>
 
     <script>
@@ -390,6 +562,18 @@
 
         // Global
         let newsItems = [];
+        let editingNewsId = null; // Track if we are editing a news item
+
+        // Toast Function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-message');
+            toast.textContent = message;
+            toast.className = 'toast ' + type; // success, error, warning
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
         // ---------- Authentication ----------
         function checkPassword() {
@@ -432,6 +616,9 @@
                 document.getElementById('admin-site-status').value = s.status || 'active';
                 document.getElementById('admin-brand').value = s.brand || 'ROG HUB';
                 document.getElementById('admin-notice').value = s.notice || '';
+                // Toggle switches
+                document.getElementById('toggle-news').checked = s.showNews !== false; // default true
+                document.getElementById('toggle-ads').checked = s.showAds !== false;   // default true
                 if (s.primary) setTheme(s.primary, s.secondary || s.primary);
             });
 
@@ -460,6 +647,62 @@
         function applyCustomColor() {
             const color = document.getElementById('customPrimary').value;
             setTheme(color, color);
+        }
+
+        // Save theme only
+        function saveTheme() {
+            const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+            const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+            database.ref('settings').update({ primary, secondary })
+                .then(() => showToast('Theme saved!', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
+
+        // ---------- Security Settings ----------
+        function saveSecurity() {
+            const secret = document.getElementById('admin-default-secret').value;
+            const timer = document.getElementById('admin-otp-timer').value;
+            database.ref('settings').update({ secret: secret || null, timer })
+                .then(() => showToast('Security settings saved!', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
+
+        // ---------- Site Control ----------
+        function saveSiteControl() {
+            const status = document.getElementById('admin-site-status').value;
+            const brand = document.getElementById('admin-brand').value;
+            const notice = document.getElementById('admin-notice').value;
+            database.ref('settings').update({ status, brand, notice })
+                .then(() => showToast('Site control saved!', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
+
+        // ---------- Ads Management ----------
+        function saveAds() {
+            const ads = {};
+            for (let i = 1; i <= 10; i++) {
+                const adInput = document.getElementById(`admin-ad-${i}`);
+                if (adInput) ads[`ad_${i}`] = adInput.value;
+            }
+            // Use set() because we want to replace the entire ads object
+            database.ref('ads').set(ads)
+                .then(() => showToast('Ads saved!', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
+
+        // ---------- Toggle Switches ----------
+        function toggleNewsVisibility() {
+            const showNews = document.getElementById('toggle-news').checked;
+            database.ref('settings').update({ showNews })
+                .then(() => showToast('News visibility updated', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
+
+        function toggleAdsVisibility() {
+            const showAds = document.getElementById('toggle-ads').checked;
+            database.ref('settings').update({ showAds })
+                .then(() => showToast('Ads visibility updated', 'success'))
+                .catch(err => showToast('Error: ' + err, 'error'));
         }
 
         // ---------- OTP Preview ----------
@@ -504,17 +747,31 @@
                             <div class="admin-news-title">${item.title}</div>
                             <div class="admin-news-preview">${item.body.substring(0,40)}${item.body.length>40?'...':''}</div>
                         </div>
-                        <span class="admin-news-delete" onclick="deleteNews('${item.id}')"><i class="fa-solid fa-trash"></i></span>
+                        <div class="admin-news-actions">
+                            <span class="admin-news-edit" onclick="editNews('${item.id}')"><i class="fa-solid fa-pencil"></i></span>
+                            <span class="admin-news-delete" onclick="deleteNews('${item.id}')"><i class="fa-solid fa-trash"></i></span>
+                        </div>
                     </div>
                 `;
             });
             listDiv.innerHTML = html;
         }
 
+        function editNews(id) {
+            const item = newsItems.find(n => n.id == id);
+            if (!item) return;
+            document.getElementById('admin-news-title').value = item.title;
+            document.getElementById('admin-news-body').value = item.body;
+            editingNewsId = id;
+            document.getElementById('add-news-btn').innerHTML = '✏️ Update News';
+            document.getElementById('clear-news-btn').innerHTML = '❌ Cancel';
+        }
+
         function deleteNews(id) {
             newsItems = newsItems.filter(item => item.id != id);
             saveNewsToFirebase();
             renderAdminNews();
+            if (editingNewsId == id) clearNewsInputs(); // if deleted the one being edited
         }
 
         function deleteAllNews() {
@@ -522,18 +779,29 @@
                 newsItems = [];
                 saveNewsToFirebase();
                 renderAdminNews();
+                clearNewsInputs();
             }
         }
 
-        function addNewsItem() {
+        function addOrUpdateNewsItem() {
             const title = document.getElementById('admin-news-title').value.trim();
             const body = document.getElementById('admin-news-body').value.trim();
-            if (!title || !body) { alert('Enter title and description'); return; }
-            newsItems.push({
-                id: Date.now().toString(),
-                title, body,
-                time: Date.now()
-            });
+            if (!title || !body) { showToast('Enter title and description', 'warning'); return; }
+
+            if (editingNewsId) {
+                // Update existing news
+                const index = newsItems.findIndex(item => item.id == editingNewsId);
+                if (index !== -1) {
+                    newsItems[index] = { ...newsItems[index], title, body };
+                }
+            } else {
+                // Add new news
+                newsItems.push({
+                    id: Date.now().toString(),
+                    title, body,
+                    time: Date.now()
+                });
+            }
             saveNewsToFirebase();
             renderAdminNews();
             clearNewsInputs();
@@ -542,15 +810,20 @@
         function clearNewsInputs() {
             document.getElementById('admin-news-title').value = '';
             document.getElementById('admin-news-body').value = '';
+            editingNewsId = null;
+            document.getElementById('add-news-btn').innerHTML = '➕ Add News';
+            document.getElementById('clear-news-btn').innerHTML = '🗑️ Clear';
         }
 
         function saveNewsToFirebase() {
             const obj = {};
             newsItems.forEach(item => obj[item.id] = item);
-            database.ref('news').set(obj);
+            database.ref('news').set(obj)
+                .then(() => console.log('News saved'))
+                .catch(err => showToast('Error saving news: ' + err, 'error'));
         }
 
-        // ---------- Save All Settings ----------
+        // ---------- Save All Settings (legacy, uses update for settings/ads) ----------
         function saveAllSettings() {
             // Gather settings
             const secret = document.getElementById('admin-default-secret').value;
@@ -558,6 +831,8 @@
             const status = document.getElementById('admin-site-status').value;
             const brand = document.getElementById('admin-brand').value;
             const notice = document.getElementById('admin-notice').value;
+            const showNews = document.getElementById('toggle-news').checked;
+            const showAds = document.getElementById('toggle-ads').checked;
 
             // Get computed theme colors
             const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
@@ -570,24 +845,54 @@
                 brand,
                 notice,
                 primary,
-                secondary
+                secondary,
+                showNews,
+                showAds
             };
 
-            // Save settings
-            database.ref('settings').set(settings);
+            // Save settings using update() to preserve other fields
+            database.ref('settings').update(settings)
+                .then(() => {
+                    // Save ads using set()
+                    const ads = {};
+                    for (let i = 1; i <= 10; i++) {
+                        const adInput = document.getElementById(`admin-ad-${i}`);
+                        if (adInput) ads[`ad_${i}`] = adInput.value;
+                    }
+                    return database.ref('ads').set(ads);
+                })
+                .then(() => {
+                    // Save news
+                    saveNewsToFirebase();
+                    showToast('All settings saved to Firebase!', 'success');
+                })
+                .catch(err => showToast('Error: ' + err, 'error'));
+        }
 
-            // Save ads
-            const ads = {};
-            for (let i = 1; i <= 10; i++) {
-                const adInput = document.getElementById(`admin-ad-${i}`);
-                if (adInput) ads[`ad_${i}`] = adInput.value;
+        // ---------- Clear All Data ----------
+        function clearAllData() {
+            if (confirm('⚠️ Are you sure? This will delete ALL data (settings, news, ads) from Firebase. This action cannot be undone.')) {
+                database.ref().remove()
+                    .then(() => {
+                        showToast('All data cleared. Reloading form...', 'warning');
+                        // Reset form fields to defaults
+                        document.getElementById('admin-default-secret').value = '';
+                        document.getElementById('admin-otp-timer').value = '30';
+                        document.getElementById('admin-site-status').value = 'active';
+                        document.getElementById('admin-brand').value = 'ROG HUB';
+                        document.getElementById('admin-notice').value = '';
+                        document.getElementById('toggle-news').checked = true;
+                        document.getElementById('toggle-ads').checked = true;
+                        setTheme('#38bdf8', '#818cf8'); // reset to default theme
+                        newsItems = [];
+                        renderAdminNews();
+                        for (let i = 1; i <= 10; i++) {
+                            const adInput = document.getElementById(`admin-ad-${i}`);
+                            if (adInput) adInput.value = '';
+                        }
+                    })
+                    .catch(err => showToast('Error clearing data: ' + err, 'error'));
             }
-            database.ref('ads').set(ads);
-
-            // News already saved separately
-            saveNewsToFirebase();
-
-            alert('All settings saved to Firebase!');
         }
     </script>
 </body>

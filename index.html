@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin | ROG Control</title>
+    <meta name="theme-color" content="#0b0d17">
+
+    <!-- OTP Auth Library (for preview) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.1.2/otpauth.umd.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Same base styles as user panel, plus some admin-specific */
+        :root {
+            --bg-deep: #0b0d17;
+            --bg-surface: #141625;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: rgba(255, 255, 255, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-brand: linear-gradient(to right, #fff, var(--primary));
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* Password Overlay */
+        .password-prompt {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .password-modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--primary);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .password-modal h3 { color: var(--primary); font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .password-modal input { width: 100%; padding: 1rem; border-radius: 1rem; border: 1px solid var(--border); background: #1c1e2e; color: white; margin-bottom: 1rem; }
+        .password-modal .btn { width: 100%; margin-bottom: 0.5rem; }
+        .error-message { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+
+        /* Admin Panel (hidden until login) */
+        #adminContent {
+            display: none;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--bg-surface);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .logout-btn:hover { background: var(--danger); color: white; }
+
+        .admin-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-section h3 {
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-item { margin-bottom: 1.2rem; }
+        .admin-item label { display: block; color: var(--text-dim); margin-bottom: 0.5rem; font-size: 0.9rem; }
+
+        input, select, textarea {
+            width: 100%;
+            background: #1c1e2e;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 1rem;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+
+        .btn {
+            background: var(--primary);
+            color: var(--bg-deep);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: 0 10px 20px -5px var(--primary); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05) !important; color: white !important; }
+        .btn-danger { background: var(--danger) !important; }
+        .btn-danger:hover { background: #dc2626 !important; }
+
+        .theme-picker {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .color-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .color-dot:hover { transform: scale(1.2); border-color: white; }
+        .color-dot.active { border-color: white; box-shadow: 0 0 15px currentColor; }
+
+        .admin-news-list {
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .admin-news-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-news-info { flex: 1; }
+        .admin-news-title { font-weight: 600; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .admin-news-preview { font-size: 0.8rem; color: var(--text-dim); opacity: 0.7; }
+        .admin-news-delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+        .admin-news-delete:hover { background: var(--danger); color: white; }
+
+        .delete-all-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 1rem;
+        }
+        .delete-all-btn:hover { background: var(--danger); color: white; }
+
+        .preview-otp {
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .preview-otp .otp-code { font-size: 2rem; margin: 0; }
+    </style>
+</head>
+<body>
+    <!-- Password Prompt -->
+    <div class="password-prompt" id="passwordPrompt">
+        <div class="password-modal">
+            <h3><i class="fa-solid fa-lock"></i> Admin Login</h3>
+            <input type="password" id="admin-password" placeholder="Enter password" autocomplete="off">
+            <button class="btn" onclick="checkPassword()">Login</button>
+            <div class="error-message" id="password-error">Wrong password!</div>
+        </div>
+    </div>
+
+    <!-- Admin Main Content (hidden until authenticated) -->
+    <div id="adminContent">
+        <div class="admin-header">
+            <h1><i class="fa-solid fa-lock"></i> Admin Control Panel</h1>
+            <div class="logout-btn" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
+        </div>
+
+        <!-- Theme Customizer -->
+        <div class="admin-section">
+            <h3><i class="fa-solid fa-palette"></i> Theme Customizer</h3>
+            <div class="theme-picker">
+                <div class="color-dot" style="background: #38bdf8;" onclick="setTheme('#38bdf8', '#818cf8')" title="Sky Blue"></div>
+                <div class="color-dot" style="background: #fbbf24;" onclick="setTheme('#fbbf24', '#f59e0b')" title="Yellow"></div>
+                <div class="color-dot" style="background: #34d399;" onclick="setTheme('#34d399', '#10b981')" title="Green"></div>
+                <div class="color-dot" style="background: #f87171;" onclick="setTheme('#f87171', '#ef4444')" title="Red"></div>
+                <div class="color-dot" style="background: #c084fc;" onclick="setTheme('#c084fc', '#a78bfa')" title="Purple"></div>
+                <div class="color-dot" style="background: #f472b6;" onclick="setTheme('#f472b6', '#ec4899')" title="Pink"></div>
+            </div>
+            <div class="admin-item">
+                <label>Custom Primary Color</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="color" id="customPrimary" value="#38bdf8" style="width: 60px; height: 50px; padding: 0;">
+                    <button class="btn btn-secondary" onclick="applyCustomColor()" style="padding: 0.5rem 1rem;">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="admin-section">
+            <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
+            <div class="admin-item">
+                <label>Default Secret Key</label>
+                <input type="text" id="admin-default-secret" placeholder="BASE32-SECRET-KEY">
+            </div>
+            <div class="admin-item">
+                <label>OTP Timer (seconds)</label>
+                <select id="admin-otp-timer">
+                    <option value="30">30 seconds (default)</option>
+                    <option value="60">60 seconds</option>
+                </select>
+            </div>
+            <!-- OTP Preview (optional) -->
+            <div class="preview-otp">
+                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Preview with current secret:</div>
+                <div class="otp-code" id="preview-otp">------</div>
+            </div>
+        </div>
+
+        <!-- Site Control -->
+        <div class="admin-section">
+            <h3><i class="fa-solid fa-globe"></i> Site Control</h3>
+            <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="admin-item">
+                    <label>Site Status</label>
+                    <select id="admin-site-status">
+                        <option value="active">✅ Active</option>
+                        <option value="maintenance">🔧 Maintenance</option>
+                        <option value="blocked">⛔ Blocked</option>
+                    </select>
+                </div>
+                <div class="admin-item">
+                    <label>Brand Name</label>
+                    <input type="text" id="admin-brand" value="ROG HUB">
+                </div>
+            </div>
+            <div class="admin-item">
+                <label>Notice Message</label>
+                <input type="text" id="admin-notice" placeholder="Maintenance message">
+            </div>
+        </div>
+
+        <!-- News Management -->
+        <div class="admin-section">
+            <h3>
+                <i class="fa-solid fa-newspaper"></i> News Management
+                <span class="delete-all-btn" onclick="deleteAllNews()"><i class="fa-solid fa-trash-can"></i> Delete All</span>
+            </h3>
+            <div class="admin-item">
+                <label>Title</label>
+                <input type="text" id="admin-news-title" placeholder="Update title">
+            </div>
+            <div class="admin-item">
+                <label>Description</label>
+                <textarea id="admin-news-body" rows="3" placeholder="Update details..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn" onclick="addNewsItem()" style="flex: 2;">➕ Add News</button>
+                <button class="btn btn-secondary" onclick="clearNewsInputs()" style="flex: 1;">🗑️ Clear</button>
+            </div>
+            <div id="admin-news-list" class="admin-news-list"></div>
+        </div>
+
+        <!-- Ad Management (10 slots) -->
+        <div class="admin-section">
+            <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)</h3>
+            <div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                <div class="admin-item"><label>Ad 1</label><textarea id="admin-ad-1" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 2</label><textarea id="admin-ad-2" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 3</label><textarea id="admin-ad-3" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 4</label><textarea id="admin-ad-4" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 5</label><textarea id="admin-ad-5" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 6</label><textarea id="admin-ad-6" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 7</label><textarea id="admin-ad-7" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 8</label><textarea id="admin-ad-8" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 9</label><textarea id="admin-ad-9" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+                <div class="admin-item"><label>Ad 10</label><textarea id="admin-ad-10" rows="2" placeholder="AdSense code or HTML"></textarea></div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <button class="btn" onclick="saveAllSettings()" style="width: 100%; padding: 1.5rem; font-size: 1.2rem; margin-bottom: 2rem;">
+            <i class="fa-solid fa-save"></i> Save All Settings to Firebase
+        </button>
+    </div>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcCLChnvJwCc99SJVtIDb0SzUmSYL24o",
+            authDomain: "rog-2fa-tool.firebaseapp.com",
+            projectId: "rog-2fa-tool",
+            storageBucket: "rog-2fa-tool.firebasestorage.app",
+            messagingSenderId: "1016081799180",
+            appId: "1:1016081799180:web:733164f4ab45c46d924f629",
+            measurementId: "G-168SSKWYTV"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Global
+        let newsItems = [];
+
+        // ---------- Authentication ----------
+        function checkPassword() {
+            const pwd = document.getElementById('admin-password').value;
+            if (pwd === 'Rohan2007') {
+                sessionStorage.setItem('adminAuth', 'true');
+                document.getElementById('passwordPrompt').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadSettingsIntoForm(); // Load current data from Firebase
+                startPreviewTimer();     // Start OTP preview
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminAuth');
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('passwordPrompt').style.display = 'flex';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        // Auto-login if session exists
+        window.onload = function() {
+            if (sessionStorage.getItem('adminAuth') === 'true') {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadSettingsIntoForm();
+                startPreviewTimer();
+            }
+        };
+
+        // ---------- Firebase Data Load ----------
+        function loadSettingsIntoForm() {
+            database.ref('settings').once('value', (snap) => {
+                const s = snap.val() || {};
+                document.getElementById('admin-default-secret').value = s.secret || '';
+                document.getElementById('admin-otp-timer').value = s.timer || '30';
+                document.getElementById('admin-site-status').value = s.status || 'active';
+                document.getElementById('admin-brand').value = s.brand || 'ROG HUB';
+                document.getElementById('admin-notice').value = s.notice || '';
+                if (s.primary) setTheme(s.primary, s.secondary || s.primary);
+            });
+
+            database.ref('news').once('value', (snap) => {
+                const data = snap.val();
+                newsItems = data ? Object.values(data) : [];
+                renderAdminNews();
+            });
+
+            database.ref('ads').once('value', (snap) => {
+                const ads = snap.val() || {};
+                for (let i = 1; i <= 10; i++) {
+                    const el = document.getElementById(`admin-ad-${i}`);
+                    if (el) el.value = ads[`ad_${i}`] || '';
+                }
+            });
+        }
+
+        // ---------- Theme ----------
+        function setTheme(primary, secondary) {
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--secondary', secondary || primary);
+            document.documentElement.style.setProperty('--gradient-brand', `linear-gradient(to right, #fff, ${primary})`);
+        }
+
+        function applyCustomColor() {
+            const color = document.getElementById('customPrimary').value;
+            setTheme(color, color);
+        }
+
+        // ---------- OTP Preview ----------
+        let previewInterval;
+        function startPreviewTimer() {
+            if (previewInterval) clearInterval(previewInterval);
+            updatePreviewOtp();
+            previewInterval = setInterval(updatePreviewOtp, 500);
+        }
+
+        function updatePreviewOtp() {
+            const secret = document.getElementById('admin-default-secret').value.trim().replace(/\s/g, '').toUpperCase();
+            const timer = parseInt(document.getElementById('admin-otp-timer').value) || 30;
+            if (!secret) {
+                document.getElementById('preview-otp').innerText = '------';
+                return;
+            }
+            try {
+                const totp = new OTPAuth.TOTP({
+                    secret: OTPAuth.Secret.fromBase32(secret),
+                    digits: 6,
+                    period: timer
+                });
+                document.getElementById('preview-otp').innerText = totp.generate();
+            } catch (e) {
+                document.getElementById('preview-otp').innerText = '------';
+            }
+        }
+
+        // ---------- News Management ----------
+        function renderAdminNews() {
+            const listDiv = document.getElementById('admin-news-list');
+            if (!newsItems.length) {
+                listDiv.innerHTML = '<div style="color: var(--text-dim); padding: 1rem; text-align: center;">No news</div>';
+                return;
+            }
+            let html = '';
+            newsItems.slice().reverse().forEach(item => {
+                html += `
+                    <div class="admin-news-item">
+                        <div class="admin-news-info">
+                            <div class="admin-news-title">${item.title}</div>
+                            <div class="admin-news-preview">${item.body.substring(0,40)}${item.body.length>40?'...':''}</div>
+                        </div>
+                        <span class="admin-news-delete" onclick="deleteNews('${item.id}')"><i class="fa-solid fa-trash"></i></span>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
+        }
+
+        function deleteNews(id) {
+            newsItems = newsItems.filter(item => item.id != id);
+            saveNewsToFirebase();
+            renderAdminNews();
+        }
+
+        function deleteAllNews() {
+            if (confirm('Delete all news?')) {
+                newsItems = [];
+                saveNewsToFirebase();
+                renderAdminNews();
+            }
+        }
+
+        function addNewsItem() {
+            const title = document.getElementById('admin-news-title').value.trim();
+            const body = document.getElementById('admin-news-body').value.trim();
+            if (!title || !body) { alert('Enter title and description'); return; }
+            newsItems.push({
+                id: Date.now().toString(),
+                title, body,
+                time: Date.now()
+            });
+            saveNewsToFirebase();
+            renderAdminNews();
+            clearNewsInputs();
+        }
+
+        function clearNewsInputs() {
+            document.getElementById('admin-news-title').value = '';
+            document.getElementById('admin-news-body').value = '';
+        }
+
+        function saveNewsToFirebase() {
+            const obj = {};
+            newsItems.forEach(item => obj[item.id] = item);
+            database.ref('news').set(obj);
+        }
+
+        // ---------- Save All Settings ----------
+        function saveAllSettings() {
+            // Gather settings
+            const secret = document.getElementById('admin-default-secret').value;
+            const timer = document.getElementById('admin-otp-timer').value;
+            const status = document.getElementById('admin-site-status').value;
+            const brand = document.getElementById('admin-brand').value;
+            const notice = document.getElementById('admin-notice').value;
+
+            // Get computed theme colors
+            const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+            const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim();
+
+            const settings = {
+                secret: secret || null,
+                timer,
+                status,
+                brand,
+                notice,
+                primary,
+                secondary
+            };
+
+            // Save settings
+            database.ref('settings').set(settings);
+
+            // Save ads
+            const ads = {};
+            for (let i = 1; i <= 10; i++) {
+                const adInput = document.getElementById(`admin-ad-${i}`);
+                if (adInput) ads[`ad_${i}`] = adInput.value;
+            }
+            database.ref('ads').set(ads);
+
+            // News already saved separately
+            saveNewsToFirebase();
+
+            alert('All settings saved to Firebase!');
+        }
+    </script>
+</body>
+</html>

@@ -409,7 +409,7 @@
             </div>
         </div>
 
-        <!-- Theme Customizer -->
+        <!-- 1. Theme Customizer -->
         <div class="admin-section">
             <div class="section-header">
                 <h3><i class="fa-solid fa-palette"></i> Theme Customizer</h3>
@@ -432,31 +432,7 @@
             </div>
         </div>
 
-        <!-- Security Settings -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
-                <span class="save-section-btn" onclick="saveSecurity()"><i class="fa-solid fa-save"></i> Save Security</span>
-            </div>
-            <div class="admin-item">
-                <label>Default Secret Key</label>
-                <input type="text" id="admin-default-secret" placeholder="BASE32-SECRET-KEY">
-            </div>
-            <div class="admin-item">
-                <label>OTP Timer (seconds)</label>
-                <select id="admin-otp-timer">
-                    <option value="30">30 seconds (default)</option>
-                    <option value="60">60 seconds</option>
-                </select>
-            </div>
-            <!-- OTP Preview (optional) -->
-            <div class="preview-otp">
-                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Preview with current secret:</div>
-                <div class="otp-code" id="preview-otp">------</div>
-            </div>
-        </div>
-
-        <!-- Site Control -->
+        <!-- 2. Site Control (moved to top) -->
         <div class="admin-section">
             <div class="section-header">
                 <h3><i class="fa-solid fa-globe"></i> Site Control</h3>
@@ -482,7 +458,31 @@
             </div>
         </div>
 
-        <!-- News Management -->
+        <!-- 3. Security Settings -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
+                <span class="save-section-btn" onclick="saveSecurity()"><i class="fa-solid fa-save"></i> Save Security</span>
+            </div>
+            <div class="admin-item">
+                <label>Default Secret Key</label>
+                <input type="text" id="admin-default-secret" placeholder="BASE32-SECRET-KEY">
+            </div>
+            <div class="admin-item">
+                <label>OTP Timer (seconds)</label>
+                <select id="admin-otp-timer">
+                    <option value="30">30 seconds (default)</option>
+                    <option value="60">60 seconds</option>
+                </select>
+            </div>
+            <!-- OTP Preview (optional) -->
+            <div class="preview-otp">
+                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:0.5rem;">Preview with current secret:</div>
+                <div class="otp-code" id="preview-otp">------</div>
+            </div>
+        </div>
+
+        <!-- 4. News Management -->
         <div class="admin-section">
             <div class="section-header">
                 <h3><i class="fa-solid fa-newspaper"></i> News Management</h3>
@@ -509,7 +509,7 @@
             <div id="admin-news-list" class="admin-news-list"></div>
         </div>
 
-        <!-- Ad Management (10 slots) -->
+        <!-- 5. Ad Management (10 slots) -->
         <div class="admin-section">
             <div class="section-header">
                 <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)</h3>

@@ -392,7 +392,7 @@
     <!-- Password Prompt -->
     <div class="password-prompt" id="passwordPrompt">
         <div class="password-modal">
-            <h3><i class="fa-solid fa-lock"></i> Admin Login</h3>
+            <h3><i class="fa-solid fa-lock"></i> Admin Login <i class="fas fa-check-circle" style="color: rgb(97,64,81)(#800080);"></i></h3>
             <input type="password" id="admin-password" placeholder="Enter password" autocomplete="off">
             <button class="btn" onclick="checkPassword()">Login</button>
             <div class="error-message" id="password-error">Wrong password!</div>
@@ -402,7 +402,7 @@
     <!-- Admin Main Content (hidden until authenticated) -->
     <div id="adminContent">
         <div class="admin-header">
-            <h1><i class="fa-solid fa-lock"></i> Admin Control Panel</h1>
+            <h1><i class="fa-solid fa-lock"></i>ROG Admin Pannel <i class="fas fa-check-circle" style="color: rgb(0, 191, 255); opacity: 1;"></i></i></h1>
             <div class="header-buttons">
                 <div class="clear-all-btn" onclick="clearAllData()"><i class="fa-solid fa-trash-can"></i> Clear All Data</div>
                 <div class="logout-btn" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
@@ -412,7 +412,7 @@
         <!-- 1. Theme Customizer -->
         <div class="admin-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-palette"></i> Theme Customizer</h3>
+                <h3><i class="fa-solid fa-palette"></i> Theme Customizer<i class="fas fa-check-circle" style="color: rgb(186, 85, 211); opacity: 1;"></i></h3>
                 <span class="save-section-btn" onclick="saveTheme()"><i class="fa-solid fa-save"></i> Save Theme</span>
             </div>
             <div class="theme-picker">
@@ -435,7 +435,7 @@
         <!-- 2. Site Control (moved to top) -->
         <div class="admin-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-globe"></i> Site Control</h3>
+                <h3><i class="fa-solid fa-globe"></i> Site Control<i class="fas fa-check-circle" style="color:yellow; opacity:1100000000000.100007;"></i></h3>
                 <span class="save-section-btn" onclick="saveSiteControl()"><i class="fa-solid fa-save"></i> Save Site Control</span>
             </div>
             <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -461,7 +461,7 @@
         <!-- 3. Security Settings -->
         <div class="admin-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-shield"></i> Security Settings</h3>
+                <h3><i class="fa-solid fa-shield"></i> Security Settings<i class="fas fa-check-circle" style="color: rgb(0, 191, 255); opacity: 1;"></i></h3>
                 <span class="save-section-btn" onclick="saveSecurity()"><i class="fa-solid fa-save"></i> Save Security</span>
             </div>
             <div class="admin-item">
@@ -485,7 +485,7 @@
         <!-- 4. News Management -->
         <div class="admin-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-newspaper"></i> News Management</h3>
+                <h3><i class="fa-solid fa-newspaper"></i> News Management<i class="fas fa-check-circle" style="color:blue; opacity:1100000000000.100007;"></i></h3>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <span class="delete-all-btn" onclick="deleteAllNews()"><i class="fa-solid fa-trash-can"></i> Delete All</span>
                     <label class="toggle-switch">
@@ -504,7 +504,7 @@
             </div>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button class="btn" id="add-news-btn" onclick="addOrUpdateNewsItem()" style="flex: 2;">➕ Add News</button>
-                <button class="btn btn-secondary" onclick="clearNewsInputs()" style="flex: 1;" id="clear-news-btn">🗑️ Clear</button>
+                <button class="btn btn-secondary" onclick="clearNewsInputs()" style="flex: 1;" id="clear-news-btn"><i class="fa-solid fa-trash-can"></i>Clear</button>
             </div>
             <div id="admin-news-list" class="admin-news-list"></div>
         </div>
@@ -512,7 +512,7 @@
         <!-- 5. Ad Management (10 slots) -->
         <div class="admin-section">
             <div class="section-header">
-                <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)</h3>
+                <h3><i class="fa-solid fa-ad"></i> Ad Management (10 Slots)<i class="fas fa-check-circle" style="color:red;"></i></h3>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <span class="save-section-btn" onclick="saveAds()"><i class="fa-solid fa-save"></i> Save All Ads</span>
                     <label class="toggle-switch">
@@ -537,7 +537,7 @@
 
         <!-- Optional: Old Save All button (can be removed, but kept for convenience) -->
         <button class="btn" onclick="saveAllSettings()" style="width: 100%; padding: 1.5rem; font-size: 1.2rem; margin-bottom: 2rem;">
-            <i class="fa-solid fa-save"></i> Save All Settings to Firebase (Legacy)
+            <i class="fa-solid fa-save"></i> Save All Settings</i>
         </button>
     </div>
 
